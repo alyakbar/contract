@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sendAppointmentConfirmation } from '@/lib/resend';
+import { sendAppointmentConfirmation, sendAppointmentNotificationToProfessional } from '@/lib/resend';
 
 // Mock appointments storage (in production, use database)
 let appointments = [
@@ -84,6 +84,23 @@ export async function POST(request: Request) {
             });
         } catch (emailError) {
             console.error('Failed to send confirmation email:', emailError);
+            // Don't fail the appointment creation if email fails
+        }
+
+        // Send notification email to the legal professional (Patrick)
+        try {
+            await sendAppointmentNotificationToProfessional({
+                professionalName: newAppointment.professionalName,
+                professionalEmail: 'faithkalau9@gmail.com', // Patrick's email
+                userName: newAppointment.userName,
+                userEmail: newAppointment.userEmail,
+                userPhone: body.phone || '',
+                date: newAppointment.date,
+                time: newAppointment.time,
+                message: newAppointment.message,
+            });
+        } catch (emailError) {
+            console.error('Failed to send notification to professional:', emailError);
             // Don't fail the appointment creation if email fails
         }
 

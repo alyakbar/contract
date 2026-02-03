@@ -8,7 +8,7 @@ const legalProfessionals = [
         bio: 'Experienced employment law specialist helping workers understand their rights. Specializes in contract review, workplace disputes, and labor law compliance in Kenya.',
         location: 'Nairobi, Kenya',
         availability: 'Mon-Fri',
-        contactEmail: 'nwereswe@gmail.com',
+        contactEmail: 'faithkalau9@gmail.com',
         imageUrl: '/avatars/patrick.jpg',
     },
 ];

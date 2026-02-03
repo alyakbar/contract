@@ -19,7 +19,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative bg-[var(--primary-navy)] text-white overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white/20 rounded-full -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-[40rem] h-[40rem] bg-white/10 rounded-full translate-x-1/4 translate-y-1/4" />
         </div>
@@ -48,12 +48,12 @@ export default function Home() {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up relative z-10" style={{ animationDelay: '0.2s' }}>
               <Link href="/check" className="btn btn-accent text-base px-8 py-4 w-full sm:w-auto">
                 <FileCheck className="w-5 h-5" />
                 Check My Contract
               </Link>
-              <Link href="/red-flags" className="btn btn-secondary !bg-white/10 !text-white !border-white/20 hover:!bg-white/20 text-base px-8 py-4 w-full sm:w-auto">
+              <Link href="/red-flags" className="btn !bg-[var(--accent-coral)] !text-white !border-[var(--accent-coral)] hover:!bg-[var(--accent-coral)]/90 text-base px-8 py-4 w-full sm:w-auto">
                 <AlertTriangle className="w-5 h-5" />
                 Learn Red Flags
               </Link>
@@ -62,7 +62,7 @@ export default function Home() {
         </div>
 
         {/* Wave Separator */}
-        <div className="absolute bottom-0 left-0 right-0">
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
           <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
             <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="var(--background)" />
           </svg>
