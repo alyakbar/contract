@@ -13,53 +13,21 @@ import {
     X,
     Mail,
     Phone,
-    ChevronRight
+    ChevronRight,
+    Loader2
 } from 'lucide-react';
 
 const legalProfessionals = [
     {
         id: '1',
-        name: 'Dr. Sarah Chen',
+        name: 'Patrick',
         specialization: 'Employment Law',
-        bio: 'Former labor law professor with 15+ years helping workers understand their rights. Specializes in contract review and workplace disputes.',
-        location: 'New York, NY',
-        availability: 'Mon-Thu',
-        imageUrl: '/avatars/sarah.jpg',
-        rating: 4.9,
-        reviews: 127,
-    },
-    {
-        id: '2',
-        name: 'Michael Okonkwo',
-        specialization: 'Worker Rights',
-        bio: 'Advocate for gig workers and independent contractors. Expert in non-traditional employment arrangements.',
-        location: 'Los Angeles, CA',
-        availability: 'Tue-Sat',
-        imageUrl: '/avatars/michael.jpg',
-        rating: 4.8,
-        reviews: 89,
-    },
-    {
-        id: '3',
-        name: 'Elena Rodriguez',
-        specialization: 'Contract Law',
-        bio: 'Specializes in reviewing employment contracts for early-career professionals. Fluent in Spanish and English.',
-        location: 'Miami, FL',
+        bio: 'Experienced employment law specialist helping workers understand their rights. Specializes in contract review, workplace disputes, and labor law compliance in Kenya.',
+        location: 'Nairobi, Kenya',
         availability: 'Mon-Fri',
-        imageUrl: '/avatars/elena.jpg',
+        imageUrl: '/avatars/patrick.jpg',
         rating: 4.9,
-        reviews: 156,
-    },
-    {
-        id: '4',
-        name: 'James Patel',
-        specialization: 'Corporate Employment',
-        bio: 'Experienced in executive contracts and equity compensation. Helps professionals negotiate better terms.',
-        location: 'San Francisco, CA',
-        availability: 'Wed-Sun',
-        imageUrl: '/avatars/james.jpg',
-        rating: 4.7,
-        reviews: 72,
+        reviews: 150,
     },
 ];
 
@@ -75,6 +43,8 @@ export default function SupportPage() {
     const [selectedTime, setSelectedTime] = useState('');
     const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
     const [bookingComplete, setBookingComplete] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
 
     const handleSelectProfessional = (professional: typeof legalProfessionals[0]) => {
         setSelectedProfessional(professional);
@@ -87,9 +57,42 @@ export default function SupportPage() {
         }
     };
 
-    const handleConfirm = () => {
-        // Simulate booking submission
-        setBookingComplete(true);
+    const handleConfirm = async () => {
+        if (!selectedProfessional || !formData.name || !formData.email) return;
+
+        setIsSubmitting(true);
+        setSubmitError('');
+
+        try {
+            const response = await fetch('/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    legalProfessionalId: selectedProfessional.id,
+                    date: selectedDate,
+                    time: selectedTime,
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    message: formData.message,
+                    professionalName: selectedProfessional.name,
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to book appointment');
+            }
+
+            setBookingComplete(true);
+        } catch (error) {
+            console.error('Booking error:', error);
+            setSubmitError(error instanceof Error ? error.message : 'Failed to book appointment. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const resetBooking = () => {
@@ -99,6 +102,7 @@ export default function SupportPage() {
         setSelectedTime('');
         setFormData({ name: '', email: '', phone: '', message: '' });
         setBookingComplete(false);
+        setSubmitError('');
     };
 
     // Generate next 7 days
@@ -198,8 +202,8 @@ export default function SupportPage() {
                                 return (
                                     <div key={step} className="flex items-center gap-3">
                                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${isActive
-                                                ? 'bg-[var(--primary-navy)] text-white'
-                                                : 'bg-gray-100 text-gray-400'
+                                            ? 'bg-[var(--primary-navy)] text-white'
+                                            : 'bg-gray-100 text-gray-400'
                                             }`}>
                                             {i + 1}
                                         </div>
@@ -296,8 +300,8 @@ export default function SupportPage() {
                                         key={day.date}
                                         onClick={() => setSelectedDate(day.display)}
                                         className={`p-3 rounded-lg border-2 text-center transition-colors ${selectedDate === day.display
-                                                ? 'border-[var(--secondary-teal)] bg-[var(--secondary-teal)]/5'
-                                                : 'border-gray-200 hover:border-gray-300'
+                                            ? 'border-[var(--secondary-teal)] bg-[var(--secondary-teal)]/5'
+                                            : 'border-gray-200 hover:border-gray-300'
                                             }`}
                                     >
                                         <div className="text-sm font-medium">{day.display}</div>
@@ -312,8 +316,8 @@ export default function SupportPage() {
                                         key={time}
                                         onClick={() => setSelectedTime(time)}
                                         className={`p-3 rounded-lg border-2 text-center transition-colors ${selectedTime === time
-                                                ? 'border-[var(--secondary-teal)] bg-[var(--secondary-teal)]/5'
-                                                : 'border-gray-200 hover:border-gray-300'
+                                            ? 'border-[var(--secondary-teal)] bg-[var(--secondary-teal)]/5'
+                                            : 'border-gray-200 hover:border-gray-300'
                                             }`}
                                     >
                                         <div className="flex items-center justify-center gap-2">
@@ -415,13 +419,28 @@ export default function SupportPage() {
                                 </p>
                             </div>
 
+                            {submitError && (
+                                <div className="p-4 bg-red-50 rounded-lg border border-red-200 mb-6">
+                                    <p className="text-sm text-red-800">{submitError}</p>
+                                </div>
+                            )}
+
                             <button
                                 onClick={handleConfirm}
-                                disabled={!formData.name || !formData.email}
+                                disabled={!formData.name || !formData.email || isSubmitting}
                                 className="btn btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Confirm Booking
-                                <CheckCircle2 className="w-4 h-4" />
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Booking...
+                                    </>
+                                ) : (
+                                    <>
+                                        Confirm Booking
+                                        <CheckCircle2 className="w-4 h-4" />
+                                    </>
+                                )}
                             </button>
                         </div>
                     )}

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sendAppointmentConfirmation } from '@/lib/resend';
 
 // Mock appointments storage (in production, use database)
 let appointments = [
@@ -71,7 +72,20 @@ export async function POST(request: Request) {
 
         appointments.push(newAppointment);
 
-        // In production, send confirmation email here
+        // Send confirmation email via Resend
+        try {
+            await sendAppointmentConfirmation({
+                userName: newAppointment.userName,
+                userEmail: newAppointment.userEmail,
+                professionalName: newAppointment.professionalName,
+                date: newAppointment.date,
+                time: newAppointment.time,
+                message: newAppointment.message,
+            });
+        } catch (emailError) {
+            console.error('Failed to send confirmation email:', emailError);
+            // Don't fail the appointment creation if email fails
+        }
 
         return NextResponse.json(newAppointment, { status: 201 });
     } catch (error) {
