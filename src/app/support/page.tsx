@@ -17,19 +17,7 @@ import {
     Loader2
 } from 'lucide-react';
 
-const legalProfessionals = [
-    {
-        id: '1',
-        name: 'Patrick',
-        specialization: 'Employment Law',
-        bio: 'Experienced employment law specialist helping workers understand their rights. Specializes in contract review, workplace disputes, and labor law compliance in Kenya.',
-        location: 'Nairobi, Kenya',
-        availability: 'Mon-Fri',
-        imageUrl: '/avatars/patrick.jpg',
-        rating: 4.9,
-        reviews: 150,
-    },
-];
+import { legalProfessionals } from '@/lib/legalProfessionals';
 
 const timeSlots = [
     '9:00 AM', '10:00 AM', '11:00 AM',

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sendAppointmentConfirmation, sendAppointmentNotificationToProfessional } from '@/lib/resend';
+import { legalProfessionals } from '@/lib/legalProfessionals';
 
 // Mock appointments storage (in production, use database)
 let appointments = [
@@ -33,6 +34,7 @@ export async function GET() {
     return NextResponse.json(appointments);
 }
 
+
 export async function POST(request: Request) {
     try {
         const body = await request.json();
@@ -57,6 +59,11 @@ export async function POST(request: Request) {
             );
         }
 
+        // Find the selected professional
+        const selectedProfessional = legalProfessionals.find(p => p.id === body.legalProfessionalId);
+        const professionalName = selectedProfessional ? selectedProfessional.name : (body.professionalName || 'Legal Professional');
+        const professionalEmail = selectedProfessional ? selectedProfessional.contactEmail : 'faithkalau9@gmail.com'; // Fallback to Patrick's email if not found (shouldn't happen with valid ID)
+
         const newAppointment = {
             id: Date.now().toString(),
             userId: 'guest',
@@ -67,12 +74,12 @@ export async function POST(request: Request) {
             status: 'PENDING',
             userName: body.name,
             userEmail: body.email,
-            professionalName: body.professionalName || 'Legal Professional',
+            professionalName: professionalName,
         };
 
         appointments.push(newAppointment);
 
-        // Send confirmation email via Resend
+        // Send confirmation email to the user (sender of the form)
         try {
             await sendAppointmentConfirmation({
                 userName: newAppointment.userName,
@@ -83,15 +90,15 @@ export async function POST(request: Request) {
                 message: newAppointment.message,
             });
         } catch (emailError) {
-            console.error('Failed to send confirmation email:', emailError);
+            console.error('Failed to send confirmation email to user:', emailError);
             // Don't fail the appointment creation if email fails
         }
 
-        // Send notification email to the legal professional (Patrick)
+        // Send notification email to the legal professional
         try {
             await sendAppointmentNotificationToProfessional({
                 professionalName: newAppointment.professionalName,
-                professionalEmail: 'faithkalau9@gmail.com', // Patrick's email
+                professionalEmail: professionalEmail,
                 userName: newAppointment.userName,
                 userEmail: newAppointment.userEmail,
                 userPhone: body.phone || '',

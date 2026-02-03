@@ -1,17 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const legalProfessionals = [
-    {
-        id: '1',
-        name: 'Patrick',
-        specialization: 'Employment Law',
-        bio: 'Experienced employment law specialist helping workers understand their rights. Specializes in contract review, workplace disputes, and labor law compliance in Kenya.',
-        location: 'Nairobi, Kenya',
-        availability: 'Mon-Fri',
-        contactEmail: 'faithkalau9@gmail.com',
-        imageUrl: '/avatars/patrick.jpg',
-    },
-];
+import { legalProfessionals } from '@/lib/legalProfessionals';
 
 export async function GET() {
     return NextResponse.json(legalProfessionals);
