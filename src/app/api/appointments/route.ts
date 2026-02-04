@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { sendAppointmentConfirmation, sendAppointmentNotificationToProfessional } from '@/lib/resend';
+import { sendAppointmentConfirmation } from '@/lib/resend';
+import { sendEmailWithNodemailer } from '@/lib/nodemailer';
 import { legalProfessionals } from '@/lib/legalProfessionals';
 
 // Mock appointments storage (in production, use database)
@@ -96,16 +97,23 @@ export async function POST(request: Request) {
 
         // Send notification email to the legal professional
         try {
-            await sendAppointmentNotificationToProfessional({
-                professionalName: newAppointment.professionalName,
-                professionalEmail: professionalEmail,
-                userName: newAppointment.userName,
-                userEmail: newAppointment.userEmail,
-                userPhone: body.phone || '',
-                date: newAppointment.date,
-                time: newAppointment.time,
-                message: newAppointment.message,
-            });
+
+
+            if (!professionalEmail) {
+                console.error('Professional email is empty! Cannot send notification.');
+            } else {
+                // Use Nodemailer to send to any email (bypasses Resend restrictions)
+                const notificationResult = await sendEmailWithNodemailer({
+                    professionalName: newAppointment.professionalName,
+                    professionalEmail: professionalEmail,
+                    userName: newAppointment.userName,
+                    userEmail: newAppointment.userEmail,
+                    userPhone: body.phone || '',
+                    date: newAppointment.date,
+                    time: newAppointment.time,
+                    message: newAppointment.message,
+                });
+            }
         } catch (emailError) {
             console.error('Failed to send notification to professional:', emailError);
             // Don't fail the appointment creation if email fails

@@ -184,6 +184,9 @@ export async function sendAppointmentNotificationToProfessional(data: Profession
     try {
         const { professionalName, professionalEmail, userName, userEmail, userPhone, date, time, message } = data;
 
+        console.log('Attempting to send email to professional:', professionalEmail);
+        console.log('Using from email:', process.env.RESEND_FROM_EMAIL || 'ContractGuard <noreply@resend.dev>');
+
         const result = await resend.emails.send({
             from: process.env.RESEND_FROM_EMAIL || 'ContractGuard <noreply@resend.dev>',
             to: professionalEmail,
@@ -298,9 +301,11 @@ export async function sendAppointmentNotificationToProfessional(data: Profession
             `,
         });
 
+        console.log('Resend API full response:', JSON.stringify(result, null, 2));
         return { success: true, data: result };
     } catch (error) {
         console.error('Failed to send notification email to professional:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
         return { success: false, error };
     }
 }
